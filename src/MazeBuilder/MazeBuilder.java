@@ -1,6 +1,7 @@
 package MazeBuilder;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Stack;
 
 import java.awt.Color;
@@ -76,7 +77,7 @@ public abstract class MazeBuilder
 		}
 		return fileName;
 	}
-	public String drawSolution(String fileName,Stack<Integer> solution,int n,int m,String type)
+	public String drawSolution(String fileName,Stack<Integer> solution,HashSet<Integer> visited,int n,int m,String type)
 	{
 		BufferedImage img=null;
 		try
@@ -88,7 +89,7 @@ public abstract class MazeBuilder
 		}
 		Graphics2D g=img.createGraphics();
 		int i,j,now,next;
-		g.setColor(Color.red);
+		g.setColor(Color.green);
 		if(type.toUpperCase().equals("LINE")) for(int cell=0;cell<solution.size();cell++)
 		{
 			now=solution.get(cell);
@@ -101,12 +102,22 @@ public abstract class MazeBuilder
 				else g.drawLine(j,i,j,i+(next>now?scale:-scale));
 			}
 		}
-		else if(type.toUpperCase().equals("SQUARE")) for(int cell=0;cell<solution.size();cell++)
+		else if(type.toUpperCase().equals("SQUARE"))
 		{
-			now=solution.get(cell);
-			i=((int)(now/m))*scale+1;
-			j=(now%m)*scale+1;
-			g.fillRect(j+3,i+3,scale-7,scale-7);
+			for(int cell:solution)
+			{
+				visited.remove(cell);
+				i=((int)(cell/m))*scale+1;
+				j=(cell%m)*scale+1;
+				g.fillRect(j+3,i+3,scale-7,scale-7);
+			}
+			g.setColor(Color.red);
+			for(int cell:visited)
+			{
+				i=((int)(cell/m))*scale+1;
+				j=(cell%m)*scale+1;
+				g.fillRect(j+3,i+3,scale-7,scale-7);
+			}
 		}
 		g.dispose();
 		File f=new File(fileName);
@@ -118,13 +129,5 @@ public abstract class MazeBuilder
 			System.out.println(e);
 		}
 		return fileName;
-	}
-	public String drawSolution(String fileName,Stack<Integer> solution,int d)
-	{
-		return drawSolution(fileName,solution,d,d,"LINE");
-	}
-	public String drawSolution(String fileName,Stack<Integer> solution,int n,int m)
-	{
-		return drawSolution(fileName,solution,n,m,"LINE");
 	}
 }
